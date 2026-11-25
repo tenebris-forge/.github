@@ -7,6 +7,7 @@ Dark, ember and magenta: the Tenebris Forge mood. System fonts only (GitHub serv
 as images, so web fonts do not load).
 """
 
+import json
 import math
 import re
 import random
@@ -46,6 +47,24 @@ def mark(cx, cy, size):
     return f'<defs>{defs}</defs><g transform="translate({cx - size / 2:.1f} {cy - size / 2:.1f}) scale({s:.4f})">{body}</g>'
 
 
+WORDMARK = json.loads((BRAND / "wordmark.json").read_text())
+
+
+def lockup(cx, cy, mark_size, name_size):
+    """The horizontal lockup, centred on (cx, cy): the mark, a gap, then the outlined name
+    (Geist 800, brand/wordmark.json) with "Forge" in the flame's magenta."""
+    w, s = WORDMARK["words"], name_size / WORDMARK["em"]
+    gap = mark_size * 0.2
+    name_w = (w["Tenebris"]["width"] + WORDMARK["space"] + w["Forge"]["width"]) * s
+    x0 = cx - (mark_size + gap + name_w) / 2
+    nx = x0 + mark_size + gap
+    base = cy + name_size * 0.36
+    fx = nx + (w["Tenebris"]["width"] + WORDMARK["space"]) * s
+    return (mark(x0 + mark_size / 2, cy, mark_size)
+            + f'<path fill="#ffffff" transform="translate({nx:.1f} {base:.1f}) scale({s:.4f})" d="{w["Tenebris"]["d"]}"/>'
+            + f'<path fill="#e84fc0" transform="translate({fx:.1f} {base:.1f}) scale({s:.4f})" d="{w["Forge"]["d"]}"/>')
+
+
 def banner():
     w, h = 1200, 340
     return f'''<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {w} {h}" width="{w}" height="{h}" role="img" aria-label="Tenebris Forge">
@@ -62,9 +81,8 @@ def banner():
 <rect width="{w}" height="{h}" fill="url(#veil)"/>
 <rect width="{w}" height="{h}" fill="url(#fire)"><animate attributeName="opacity" values="1;.8;1" dur="4s" repeatCount="indefinite"/></rect>
 {embers(40, w, h, 13)}
-{mark(600, 86, 96)}
-<text x="600" y="196" text-anchor="middle" font-family="{FONT}" font-size="66" font-weight="800" letter-spacing="10" fill="url(#t)" filter="url(#glow)">TENEBRIS FORGE</text>
-<text x="600" y="244" text-anchor="middle" font-family="{FONT}" font-size="22" letter-spacing="2" fill="#c9b8d8">Horror games, web apps and tools, forged in darkness</text>
+{lockup(600, 150, 128, 88)}
+<text x="600" y="272" text-anchor="middle" font-family="{FONT}" font-size="22" letter-spacing="2" fill="#c9b8d8">Horror games, web apps and tools, forged in darkness</text>
 </g>
 <rect x=".5" y=".5" width="{w - 1}" height="{h - 1}" rx="18" fill="none" stroke="#3a1f45"/>
 </svg>'''
