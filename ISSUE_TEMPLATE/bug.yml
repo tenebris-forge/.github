@@ -1,0 +1,32 @@
+name: Bug
+description: Something that does not work as it should.
+title: "fix(<scope>): <short description>"
+labels: ["type:fix", "status:proposed", "priority:normal"]
+body:
+  - type: textarea
+    id: context
+    attributes: {label: What happens, description: "Steps, what was expected, what happened, logs."}
+    validations: {required: true}
+  - type: textarea
+    id: goal
+    attributes: {label: Expected, description: "The right behaviour."}
+    validations: {required: true}
+  - type: textarea
+    id: acceptance
+    attributes: {label: Acceptance criteria, description: "Checkable statements, one per line.", value: "- [ ] "}
+    validations: {required: true}
+  - type: input
+    id: area
+    attributes: {label: Area, description: "Paths, modules or screens it touches."}
+    validations: {required: true}
+  - type: dropdown
+    id: risk
+    attributes: {label: Risk, options: ["Low: no sensitive path", "Touches a sensitive path (CODEOWNERS)"]}
+    validations: {required: true}
+  - type: textarea
+    id: links
+    attributes: {label: Links, description: "Plans, notes, conversations, related issues."}
+  - type: dropdown
+    id: source
+    attributes: {label: Source, options: ["Owner's request", "Found by the agent"]}
+    validations: {required: true}
