@@ -1,104 +1,76 @@
 #!/usr/bin/env python3
-"""Draw the Tenebris Forge logo: the hooded smith with the raised hammer over the anvil,
-in flat faceted shapes with dark outlines (the style of the Forja marks).
+"""Draw the Tenebris Forge logo in the line of the Forja mark: the faceted anvil with a
+hexagon at its heart and three sparks. Where Forja's hexagon holds a flame, Tenebris
+Forge's holds the hooded smith of the first logo, eyes burning red.
 
     python3 scripts/logo.py
 
-Writes brand/emblem.svg (transparent), brand/avatar.svg (square, dark background) and
-brand/lockup.svg (emblem over the name).
+Writes brand/mark.svg (transparent), brand/avatar.svg (square, dark) and
+brand/lockup.svg (mark beside the name).
 """
 
 from pathlib import Path
 
 OUT = Path(__file__).resolve().parent.parent / "brand"
-INK = "#1b1e24"
-P1, P2, P3, P4 = "#a155b9", "#713989", "#52216a", "#3d1752"
-CLOAK, CLOAK2, VOID = "#2a1838", "#3a2250", "#0b0610"
-RED, EMBER, SPARK = "#ff3b3b", "#fb8e31", "#ffd28a"
+INK = "#120810"
+HORN, TOP, BODY, WAIST, FOOT = "#8e3a8f", "#6b2a73", "#4e1d5a", "#6b2a73", "#2f1238"
+RING, BLOOD, EMBER = "#120810", "#9e1630", "#d62839"
+EYE, SPARK1, SPARK2, SPARK3 = "#ff4d4d", "#ff3b3b", "#e84fc0", "#fb8e31"
 FONT = "'Segoe UI', Ubuntu, 'Helvetica Neue', Arial, sans-serif"
 
 
-def poly(points, fill, stroke=INK, width=10, extra=""):
-    pts = " ".join(f"{x:.0f},{y:.0f}" for x, y in points)
-    s = f' stroke="{stroke}" stroke-width="{width}" stroke-linejoin="round" paint-order="stroke"' if stroke else ""
-    return f'<polygon points="{pts}" fill="{fill}"{s}{extra}/>'
+def poly(points: str, fill: str, width: int = 14) -> str:
+    return (f'<polygon points="{points}" fill="{fill}" stroke="{INK}" stroke-width="{width}" '
+            f'stroke-linejoin="round" paint-order="stroke"/>')
 
 
-def flame(x, base, h, w, color, lean=0.0):
-    """One curved tongue of fire: wide at the base, a hooked tip."""
-    tip = x + lean * h * 0.25
-    d = (f"M{x - w:.0f},{base:.0f} "
-         f"C{x - w * 1.25:.0f},{base - h * .45:.0f} {x - w * .2:.0f},{base - h * .5:.0f} {x - w * .45:.0f},{base - h * .78:.0f} "
-         f"C{x - w * .1:.0f},{base - h * .7:.0f} {tip - w * .1:.0f},{base - h * .9:.0f} {tip:.0f},{base - h:.0f} "
-         f"C{tip + w * .35:.0f},{base - h * .8:.0f} {x + w * 1.3:.0f},{base - h * .5:.0f} {x + w:.0f},{base:.0f} Z")
-    return (f'<path d="{d}" fill="{color}" stroke="{INK}" stroke-width="10" stroke-linejoin="round" '
-            f'paint-order="stroke"/>')
+def mark() -> str:
+    """Same geometry as the Forja mark (viewBox 0 0 512 480)."""
+    anvil = [
+        poly("28,180 98,150 98,182", HORN), poly("28,180 98,182 98,218", TOP),
+        poly("98,144 452,144 478,166 98,166", HORN), poly("98,166 478,166 458,234 98,234", TOP),
+        poly("178,234 398,234 374,330 202,330", BODY), poly("202,330 374,330 432,370 144,370", WAIST),
+        poly("144,370 432,370 456,424 120,424", FOOT),
+    ]
+    heart = (
+        f'<polygon points="288,170 367.7,216 367.7,308 288,354 208.3,308 208.3,216" fill="{RING}"/>'
+        f'<polygon points="288,190 350.4,226 350.4,298 288,334 225.6,298 225.6,226" fill="{BLOOD}"/>'
+        f'<polygon points="288,204 338.2,233 338.2,291 288,320 237.8,291 237.8,233" fill="{EMBER}"/>'
+        # the hood
+        f'<path d="M288 214 C312 222 326 246 328 272 C330 288 334 300 338 310 L238 310 C242 300 246 288 248 272 '
+        f'C250 246 264 222 288 214Z" fill="{RING}"/>'
+        f'<path d="M288 244 C302 246 310 258 308 274 C306 286 298 292 288 294 C278 292 270 286 268 274 '
+        f'C266 258 274 246 288 244Z" fill="#000"/>'
+        f'<g filter="url(#glow)"><polygon points="271,266 284,270 283,275 271,272" fill="{EYE}"/>'
+        f'<polygon points="305,266 292,270 293,275 305,272" fill="{EYE}"/></g>'
+    )
+    sparks = (
+        f'<polygon points="402,74 420,92 402,110 384,92" fill="{SPARK1}" stroke="{INK}" stroke-width="8" stroke-linejoin="round" paint-order="stroke"/>'
+        f'<polygon points="440,43 451,54 440,65 429,54" fill="{SPARK2}" stroke="{INK}" stroke-width="6" stroke-linejoin="round" paint-order="stroke"/>'
+        f'<polygon points="356,50 364,58 356,66 348,58" fill="{SPARK3}" stroke="{INK}" stroke-width="5" stroke-linejoin="round" paint-order="stroke"/>'
+    )
+    return "<g>" + "".join(anvil) + heart + sparks + "</g>"
 
 
-def flames():
-    out = []
-    tongues = [(-3.1, 150, 40, P4, -1), (3.1, 150, 40, P4, 1), (-2.1, 215, 44, P3, -.6), (2.1, 215, 44, P3, .6),
-               (-1.05, 255, 46, P3, -.3), (1.05, 255, 46, P3, .3), (0, 285, 50, P2, .1)]
-    for k, h, w, color, lean in tongues:
-        out.append(flame(256 + k * 58, 330, h, w, color, lean))
-    return "".join(out)
+DEFS = ('<defs><filter id="glow" x="-100%" y="-300%" width="300%" height="700%">'
+        '<feGaussianBlur stdDeviation="2.5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>'
+        '<radialGradient id="g" cx="50%" cy="40%" r="62%"><stop offset="0" stop-color="#7a1d5a" stop-opacity=".65"/>'
+        '<stop offset="1" stop-color="#7a1d5a" stop-opacity="0"/></radialGradient></defs>')
 
 
-def smith():
-    hood = [(256, 112), (300, 132), (326, 182), (334, 250), (360, 300), (152, 300), (178, 250), (186, 182), (212, 132)]
-    lit = [(256, 112), (212, 132), (186, 182), (178, 250), (152, 300), (206, 300), (210, 200), (232, 140)]
-    face = [(228, 172), (284, 172), (296, 222), (256, 248), (216, 222)]
-    eyes = poly([(232, 200), (250, 205), (248, 212), (230, 208)], RED, stroke=None) + \
-           poly([(280, 200), (262, 205), (264, 212), (282, 208)], RED, stroke=None)
-    glow = f'<g opacity=".55" filter="url(#eye)">{eyes}</g>'
-    arm = poly([(192, 236), (214, 252), (170, 186), (150, 196)], CLOAK2)
-    handle = poly([(150, 202), (162, 196), (128, 110), (116, 116)], P3, width=8)
-    head = poly([(84, 104), (142, 80), (154, 110), (96, 134)], P1)
-    head_side = poly([(96, 134), (154, 110), (158, 120), (100, 144)], P2, width=8)
-    return (poly(hood, CLOAK) + poly(lit, CLOAK2, stroke=None) + poly(face, VOID, width=8) + glow + eyes +
-            handle + head + head_side + arm)
-
-
-def anvil():
-    # the anvil of the Forja mark, scaled under the smith
-    parts = [([(28, 180), (98, 150), (98, 182)], P1), ([(28, 180), (98, 182), (98, 218)], P2),
-             ([(98, 144), (452, 144), (478, 166), (98, 166)], P1), ([(98, 166), (478, 166), (458, 234), (98, 234)], P2),
-             ([(178, 234), (398, 234), (374, 330), (202, 330)], P3), ([(202, 330), (374, 330), (432, 370), (144, 370)], P2),
-             ([(144, 370), (432, 370), (456, 424), (120, 424)], P4)]
-    s, dx, dy = 0.58, 256 - 253 * 0.58, 292 - 144 * 0.58
-    return "".join(poly([(dx + x * s, dy + y * s) for x, y in pts], c, width=12) for pts, c in parts)
-
-
-def sparks():
-    items = [(256, 268, 9, RED), (232, 252, 6, EMBER), (284, 246, 7, RED), (300, 266, 5, SPARK), (214, 270, 5, EMBER),
-             (268, 230, 5, SPARK), (244, 226, 4, RED)]
-    return "".join(poly([(x, y - r), (x + r, y), (x, y + r), (x - r, y)], c, width=4) for x, y, r, c in items)
-
-
-DEFS = f'''<defs>
-<filter id="eye" x="-50%" y="-200%" width="200%" height="500%"><feGaussianBlur stdDeviation="5"/></filter>
-<radialGradient id="g" cx="50%" cy="46%" r="52%"><stop offset="0" stop-color="{P3}" stop-opacity=".55"/><stop offset="1" stop-color="{P3}" stop-opacity="0"/></radialGradient>
-<radialGradient id="f" cx="50%" cy="62%" r="22%"><stop offset="0" stop-color="{RED}" stop-opacity=".45"/><stop offset="1" stop-color="{RED}" stop-opacity="0"/></radialGradient>
-</defs>'''
-
-
-def emblem():
-    return flames() + smith() + anvil() + sparks()
-
-
-def write(name, body, w=512, h=512):
-    (OUT / name).write_text(f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {w} {h}" role="img" aria-label="Tenebris Forge">{DEFS}{body}</svg>\n')
+def svg(w: int, h: int, body: str) -> str:
+    return f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {w} {h}" role="img" aria-label="Tenebris Forge">{DEFS}{body}</svg>\n'
 
 
 if __name__ == "__main__":
     OUT.mkdir(exist_ok=True)
-    write("emblem.svg", f'<g transform="translate(0 20)">{emblem()}</g>')
-    write("avatar.svg", f'<rect width="512" height="512" fill="{VOID}"/><rect width="512" height="512" fill="url(#g)"/>'
-                        f'<rect width="512" height="512" fill="url(#f)"/><g transform="translate(0 24)">{emblem()}</g>')
-    text = (f'<text x="256" y="530" text-anchor="middle" font-family="{FONT}" font-size="58" font-weight="800" '
-            f'letter-spacing="8" fill="#ffe2c4">TENEBRIS</text>'
-            f'<text x="256" y="590" text-anchor="middle" font-family="{FONT}" font-size="58" font-weight="800" '
-            f'letter-spacing="8" fill="{EMBER}">FORGE</text>')
-    write("lockup.svg", f'<rect width="512" height="620" fill="{VOID}"/><rect width="512" height="512" fill="url(#g)"/>'
-                        f'<g transform="translate(0 6)">{emblem()}</g>{text}', 512, 620)
+    for old in ("emblem.svg", "emblem.png"):
+        (OUT / old).unlink(missing_ok=True)
+    (OUT / "mark.svg").write_text(svg(512, 480, mark()))
+    (OUT / "avatar.svg").write_text(svg(512, 512, '<rect width="512" height="512" fill="#0b0610"/>'
+                                              '<rect width="512" height="512" fill="url(#g)"/>'
+                                              f'<g transform="translate(23.2 38.0) scale(0.92)">{mark()}</g>'))
+    name = (f'<text x="520" y="232" font-family="{FONT}" font-size="104" font-weight="800" letter-spacing="6" fill="#f3e6ff">TENEBRIS</text>'
+            f'<text x="522" y="352" font-family="{FONT}" font-size="104" font-weight="800" letter-spacing="6" fill="{SPARK1}">FORGE</text>')
+    (OUT / "lockup.svg").write_text(svg(1180, 480, mark() + name))
     print("brand/ written")
