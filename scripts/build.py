@@ -39,6 +39,7 @@ def banner():
 <defs>
 <radialGradient id="fire" cx="50%" cy="115%" r="70%"><stop offset="0" stop-color="#e95904" stop-opacity=".55"/><stop offset=".5" stop-color="#7a1d6a" stop-opacity=".25"/><stop offset="1" stop-color="#0b0610" stop-opacity="0"/></radialGradient>
 <radialGradient id="veil" cx="50%" cy="0%" r="80%"><stop offset="0" stop-color="#3b1060" stop-opacity=".5"/><stop offset="1" stop-color="#0b0610" stop-opacity="0"/></radialGradient>
+<linearGradient id="flame" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#ffd28a"/><stop offset=".55" stop-color="#fb8e31"/><stop offset="1" stop-color="#e95904"/></linearGradient>
 <linearGradient id="t" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#ffe2c4"/><stop offset="1" stop-color="#fb8e31"/></linearGradient>
 <filter id="glow" x="-20%" y="-50%" width="140%" height="200%"><feGaussianBlur stdDeviation="8" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
 <clipPath id="c"><rect width="{w}" height="{h}" rx="18"/></clipPath>
@@ -48,8 +49,11 @@ def banner():
 <rect width="{w}" height="{h}" fill="url(#veil)"/>
 <rect width="{w}" height="{h}" fill="url(#fire)"><animate attributeName="opacity" values="1;.8;1" dur="4s" repeatCount="indefinite"/></rect>
 {embers(40, w, h, 13)}
-<polygon points="{hexagon(600, 92, 30)}" fill="none" stroke="#e84fc0" stroke-opacity=".7" stroke-width="2.5"/>
-<polygon points="{hexagon(600, 92, 18)}" fill="#fb8e31" filter="url(#glow)"><animate attributeName="opacity" values="1;.7;1" dur="3s" repeatCount="indefinite"/></polygon>
+<polygon points="{hexagon(600, 92, 34)}" fill="#120a1a" stroke="#e84fc0" stroke-opacity=".8" stroke-width="2.5"/>
+<polygon points="{hexagon(600, 92, 27)}" fill="none" stroke="#fb8e31" stroke-opacity=".35" stroke-width="1.5"/>
+<g transform="translate({600 - 288 * 0.5:.1f} {92 - 263 * 0.5:.1f}) scale(0.5)" filter="url(#glow)">
+<path d="M288 224 C314 252 318 276 308 292 C302 302 274 302 268 292 C260 276 272 260 282 252 C284 264 290 270 294 268 C296 254 292 240 288 224Z" fill="url(#flame)">
+<animate attributeName="opacity" values="1;.75;1" dur="2.4s" repeatCount="indefinite"/></path></g>
 <text x="600" y="196" text-anchor="middle" font-family="{FONT}" font-size="66" font-weight="800" letter-spacing="10" fill="url(#t)" filter="url(#glow)">TENEBRIS FORGE</text>
 <text x="600" y="244" text-anchor="middle" font-family="{FONT}" font-size="22" letter-spacing="2" fill="#c9b8d8">Horror games, web apps and tools, forged in darkness</text>
 </g>
