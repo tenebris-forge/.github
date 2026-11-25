@@ -12,9 +12,10 @@ Writes, in brand/:
   app-icon.svg        square with safe padding for maskable app icons
   lockup-horizontal.svg, lockup-stacked.svg
 PNGs are rendered from these with resvg (see brand/README.md). Geometry on a 256 grid; no clip paths
-in the colour master. The name uses live text: outline it before print or merchandise.
+in the colour master. The name is outlined Geist 800 (scripts/wordmark.py writes brand/wordmark.json).
 """
 
+import json
 import math
 from pathlib import Path
 
@@ -113,9 +114,18 @@ def svg(w, h, body, title="Tenebris Forge"):
             f'aria-labelledby="t"><title id="t">{title}</title>{body}</svg>\n')
 
 
-def name(x, y, size, anchor="start", color="#ffffff", accent=FLAME):
-    return (f'<text x="{x}" y="{y}" text-anchor="{anchor}" font-family="{FONT}" font-size="{size}" font-weight="800" '
-            f'letter-spacing="{size * .08:.1f}"><tspan fill="{color}">TENEBRIS </tspan><tspan fill="{accent}">FORGE</tspan></text>')
+WORDMARK = json.loads((Path(__file__).resolve().parent.parent / "brand" / "wordmark.json").read_text())
+
+
+def name(x, baseline, size, anchor="start", color="#ffffff", accent=FLAME):
+    """"Tenebris Forge" as outlines (Geist 800, scripts/wordmark.py), `size` the em in px."""
+    w = WORDMARK["words"]
+    s = size / WORDMARK["em"]
+    total = (w["Tenebris"]["width"] + WORDMARK["space"] + w["Forge"]["width"]) * s
+    x0 = x - total / 2 if anchor == "middle" else x
+    x1 = x0 + (w["Tenebris"]["width"] + WORDMARK["space"]) * s
+    return (f'<path fill="{color}" transform="translate({x0:.1f} {baseline}) scale({s:.4f})" d="{w["Tenebris"]["d"]}"/>'
+            f'<path fill="{accent}" transform="translate({x1:.1f} {baseline}) scale({s:.4f})" d="{w["Forge"]["d"]}"/>')
 
 
 if __name__ == "__main__":
@@ -132,8 +142,8 @@ if __name__ == "__main__":
                                     f'<rect width="512" height="512" fill="url(#g)"/><g transform="translate(36 36) scale(1.72)">{colour()}</g>'),
         "app-icon.svg": svg(512, 512, f'<defs>{GRADIENT}</defs><rect width="512" height="512" fill="{VOID}"/>'
                                       f'<g transform="translate(96 96) scale(1.25)">{colour(small=True)}</g>'),
-        "lockup-horizontal.svg": svg(1060, 256, defs + colour() + name(284, 150, 76)),
-        "lockup-stacked.svg": svg(560, 420, defs + f'<g transform="translate(152 0)">{colour()}</g>' + name(280, 360, 60, "middle")),
+        "lockup-horizontal.svg": svg(1040, 256, defs + colour() + name(282, 164, 96)),
+        "lockup-stacked.svg": svg(560, 400, defs + f'<g transform="translate(152 0)">{colour()}</g>' + name(280, 352, 64, "middle")),
     }
     for f, s in files.items():
         (OUT / f).write_text(s)

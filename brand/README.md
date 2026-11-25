@@ -18,7 +18,14 @@ as one family. Approved on 2026-11-25.
 
 Everything is drawn by [`scripts/logo.py`](../scripts/logo.py) on a 256 grid; change the
 geometry there, never by hand in an exported file. PNGs come from the SVGs with resvg.
-The name in the lockups is live text: convert it to outlines before print or merchandise.
+
+## Name
+
+"Tenebris Forge", capital initials, in **Geist ExtraBold (800)**, the typeface of Forja's
+app: "Tenebris" in white (or ink on light backgrounds), "Forge" in the flame's magenta. The
+lockups carry it as outlines, so they look the same everywhere, print included.
+[`scripts/wordmark.py`](../scripts/wordmark.py) makes the outlines from the font in
+`fonts/` (SIL Open Font Licence, `fonts/LICENSE`); for running text, use Geist itself.
 
 ## Colours
 
