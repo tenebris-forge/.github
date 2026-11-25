@@ -8,6 +8,7 @@ as images, so web fonts do not load).
 """
 
 import math
+import re
 import random
 from pathlib import Path
 
@@ -33,6 +34,18 @@ def embers(n, w, h, seed):
     return "".join(out)
 
 
+BRAND = Path(__file__).resolve().parent.parent / "brand"
+
+
+def mark(cx, cy, size):
+    """The logo, inlined: its gradient goes into the banner and its shapes are scaled to `size`."""
+    src = (BRAND / "mark.svg").read_text()
+    defs = re.search(r"<defs>(.*?)</defs>", src, re.S).group(1)
+    body = src.split("</defs>", 1)[1].rsplit("</svg>", 1)[0]
+    s = size / 256
+    return f'<defs>{defs}</defs><g transform="translate({cx - size / 2:.1f} {cy - size / 2:.1f}) scale({s:.4f})">{body}</g>'
+
+
 def banner():
     w, h = 1200, 340
     return f'''<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {w} {h}" width="{w}" height="{h}" role="img" aria-label="Tenebris Forge">
@@ -49,11 +62,7 @@ def banner():
 <rect width="{w}" height="{h}" fill="url(#veil)"/>
 <rect width="{w}" height="{h}" fill="url(#fire)"><animate attributeName="opacity" values="1;.8;1" dur="4s" repeatCount="indefinite"/></rect>
 {embers(40, w, h, 13)}
-<polygon points="{hexagon(600, 92, 34)}" fill="#120a1a" stroke="#e84fc0" stroke-opacity=".8" stroke-width="2.5"/>
-<polygon points="{hexagon(600, 92, 27)}" fill="none" stroke="#fb8e31" stroke-opacity=".35" stroke-width="1.5"/>
-<g transform="translate({600 - 288 * 0.5:.1f} {92 - 263 * 0.5:.1f}) scale(0.5)" filter="url(#glow)">
-<path d="M288 224 C314 252 318 276 308 292 C302 302 274 302 268 292 C260 276 272 260 282 252 C284 264 290 270 294 268 C296 254 292 240 288 224Z" fill="url(#flame)">
-<animate attributeName="opacity" values="1;.75;1" dur="2.4s" repeatCount="indefinite"/></path></g>
+{mark(600, 86, 96)}
 <text x="600" y="196" text-anchor="middle" font-family="{FONT}" font-size="66" font-weight="800" letter-spacing="10" fill="url(#t)" filter="url(#glow)">TENEBRIS FORGE</text>
 <text x="600" y="244" text-anchor="middle" font-family="{FONT}" font-size="22" letter-spacing="2" fill="#c9b8d8">Horror games, web apps and tools, forged in darkness</text>
 </g>
