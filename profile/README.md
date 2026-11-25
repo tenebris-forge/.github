@@ -24,4 +24,4 @@ and ships continuously.
   <img src="https://skillicons.dev/icons?i=ts,nextjs,react,nodejs,supabase,postgres,vercel,docker&theme=dark" alt="TypeScript, Next.js, React, Node.js, Supabase, PostgreSQL, Vercel, Docker">
 </p>
 
-<p align="center"><sub>Founded by <a href="https://github.com/brunolemosdl">Bruno Lemos de Lima</a>.</sub></p>
+<p align="center"><sub>Founded by <a href="https://github.com/brunolemosdl">Bruno Lemos</a>.</sub></p>
